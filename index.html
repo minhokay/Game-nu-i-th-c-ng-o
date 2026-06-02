@@ -3,301 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nuôi vk - Phiên Bản Đặc Biệt</title>
+    <title>My Talking Tom Evolution - Full Features</title>
     <style>
         html, body {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background: #1e293b;
-            font-family: 'Courier New', Courier, monospace; user-select: none;
+            overflow: hidden; background: #0f172a;
+            font-family: 'Arial', sans-serif; user-select: none;
             display: flex; justify-content: center; align-items: center;
-            touch-action: none;
+            touch-action: none; color: #fff;
         }
 
-        /* Vỏ máy Tamagotchi cổ điển */
-        #tamagotchiDevice {
-            width: 340px; height: 500px;
-            background: linear-gradient(135deg, #06b6d4, #0891b2); /* Màu xanh thẫm cá tính */
-            border-radius: 50% 50% 45% 45% / 45% 45% 55% 55%;
-            border: 8px solid #0e7490;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset -10px -10px 15px rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; align-items: center;
-            padding: 40px 20px; box-sizing: border-box; position: relative;
+        /* Khung máy chơi game dọc di động */
+        #gameConsole {
+            width: 100%; max-width: 420px; height: 100%; max-height: 750px;
+            background: linear-gradient(135deg, #1e1b4b, #311042);
+            border: 4px solid #f43f5e; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
-        /* Màn hình LCD hiển thị game */
-        #lcdScreen {
-            width: 230px; height: 210px;
-            background: #e2e8f0; /* Màn hình xám sáng hiện đại */
-            border: 6px solid #475569; border-radius: 10px;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
-            position: relative; display: flex; flex-direction: column;
-            justify-content: space-between; padding: 10px; box-sizing: border-box;
-            color: #1e293b; transition: background 0.4s, color 0.4s;
+        /* Thanh HUD chỉ số phía trên cùng */
+        #hudTop {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15, 23, 42, 0.85); padding: 8px 15px;
+            font-size: 13px; font-weight: bold; border-bottom: 2px solid #38bdf8; z-index: 10;
         }
+        .coins-text { color: #facc15; display: flex; align-items: center; gap: 4px; }
 
-        /* Chế độ ban đêm khi đi ngủ */
-        #lcdScreen.sleep-mode { background: #1e1b4b; color: #93c5fd; }
-        #lcdScreen.sleep-mode #petAvatar { filter: brightness(0.5); }
+        /* Bảng hiển thị 4 thanh trạng thái sinh tồn */
+        #statsHUD {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+            padding: 8px 12px; background: rgba(30, 41, 59, 0.7);
+            font-size: 11px; font-weight: bold; z-index: 10;
+        }
+        .stat-bar-wrapper { display: flex; align-items: center; justify-content: space-between; }
+        .bar-bg { width: 60%; height: 10px; background: #475569; border-radius: 5px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 100%; transition: width 0.3s; }
 
-        .screen-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; margin-top: 4px; font-weight: bold;}
+        /* KHU VỰC HIỂN THỊ CHÍNH (THAY ĐỔI THEO PHÒNG) */
+        #roomDisplay {
+            flex: 1; position: relative; display: flex; justify-content: center;
+            align-items: center; transition: background 0.5s;
+            /* Mặc định Phòng khách màu ấm */
+            background: linear-gradient(to bottom, #fef08a, #ca8a04);
+        }
         
-        /* Vùng chứa nhân vật */
-        #petContainer {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-            position: relative; width: 100%; overflow: hidden;
-        }
-
-        /* Ảnh nhân vật gốc từ ảnh chụp của cậu */
+        /* Định dạng ảnh nhân vật của cậu */
         #petAvatar {
-            width: auto; height: 110px;
-            object-fit: contain;
-            transition: transform 0.1s;
+            height: 160px; width: auto; object-fit: contain; z-index: 5;
+            transition: transform 0.2s, filter 0.3s;
+        }
+        .float-anim { animation: float 0.6s ease infinite alternate; }
+        @keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
+
+        /* Tủ đồ thay màu da/tóc cho nhân vật */
+        #wardrobeSkin {
+            position: absolute; bottom: 20px; background: rgba(0,0,0,0.7);
+            padding: 6px 12px; border-radius: 20px; display: flex; gap: 8px; z-index: 6;
+        }
+        .skin-dot { width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
+
+        /* Bong bóng thoại thoại */
+        #bubbleMsg {
+            position: absolute; top: 15%; background: white; color: black;
+            padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;
+            display: none; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 8;
         }
 
-        /* Hiệu ứng hoạt họa nhún nhảy sinh động */
-        .bounce-anim { animation: petBounce 0.5s ease infinite alternate; }
-        @keyframes petBounce {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-10px) scale(1.03); }
+        /* Hệ thống Đèn ngủ / Các hiệu ứng phòng tắm */
+        #roomOverlay {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            pointer-events: none; z-index: 7; transition: background 0.5s;
         }
 
-        /* Hiệu ứng xoay tròn khi đang chơi đùa kích thích */
-        .spin-anim { animation: petSpin 0.5s linear infinite; }
-        @keyframes petSpin {
-            100% { transform: rotate(360deg); }
+        /* THANH ĐIỀU HƯỚNG CHUYỂN PHÒNG (DƯỚI MÀN HÌNH CHÍNH) */
+        #roomNavigator {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            background: #1e293b; border-top: 2px solid #475569; z-index: 10;
         }
+        .nav-tab {
+            padding: 12px 0; text-align: center; font-size: 16px; cursor: pointer;
+            border-bottom: 4px solid transparent; opacity: 0.6; transition: all 0.2s;
+        }
+        .nav-tab.active { opacity: 1; border-bottom-color: #38bdf8; background: #0f172a; }
 
-        #dialogueBubble {
-            position: absolute; top: 5px; background: rgba(255,255,255,0.95);
-            color: #000; padding: 4px 8px; border-radius: 8px; font-size: 11px;
-            font-weight: bold; display: none; text-align: center; max-width: 90%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5;
+        /* THANH HÀNH ĐỘNG DƯỚI CÙNG THEO TỪNG PHÒNG */
+        #actionFooter {
+            background: #0f172a; padding: 12px; min-height: 60px;
+            display: flex; justify-content: center; align-items: center; z-index: 10;
         }
+        .action-sub-panel { display: none; width: 100%; justify-content: space-around; gap: 8px; }
+        .action-sub-panel.active { display: flex; }
+        
+        .game-btn {
+            background: #38bdf8; border: none; padding: 10px 14px; color: white;
+            font-weight: bold; font-size: 12px; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 0 #0284c7; -webkit-tap-highlight-color: transparent;
+        }
+        .game-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0284c7; }
+        .btn-purple { background: #a855f7; box-shadow: 0 4px 0 #7e22ce; }
+        .btn-purple:active { box-shadow: 0 2px 0 #7e22ce; }
+        .btn-green { background: #22c55e; box-shadow: 0 4px 0 #16a34a; }
+        .btn-green:active { box-shadow: 0 2px 0 #16a34a; }
 
-        /* Hệ thống nút bấm bo tròn */
-        #buttonPanel {
-            display: flex; justify-content: space-around; width: 90%; margin-top: 35px; gap: 10px;
+        /* POPUP LỚN: CỬA HÀNG VÀ MINI-GAME OVERLAY */
+        .overlay-popup {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.96); z-index: 100; display: none;
+            flex-direction: column; padding: 20px; box-sizing: border-box;
         }
-        .hardware-btn {
-            width: 52px; height: 52px; background: #f43f5e; /* Nút hồng nổi bật */
-            border: none; border-radius: 50%;
-            box-shadow: 0 4px 0 #be185d, 0 6px 10px rgba(0,0,0,0.3);
-            cursor: pointer; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            font-size: 10px; font-weight: bold; color: white;
-            -webkit-tap-highlight-color: transparent;
+        .popup-title { text-align: center; color: #facc15; font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+        .items-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; flex: 1; padding-bottom: 10px; }
+        .grid-item {
+            background: #1e293b; border: 2px solid #475569; border-radius: 12px;
+            padding: 10px; text-align: center; font-size: 12px; cursor: pointer;
         }
-        .hardware-btn:active {
-            transform: translateY(4px); box-shadow: 0 0px 0 #be185d, 0 2px 5px rgba(0,0,0,0.3);
-        }
+        .grid-item:active { border-color: #facc15; }
 
-        #resetBtn {
-            position: absolute; bottom: 12px; font-size: 10px; background: #64748b;
-            color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;
-        }
+        /* Mini-game Canvas */
+        #miniGameCanvas { width: 100%; background: #020617; border-radius: 12px; flex: 1; }
+        #miniGameControls { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; }
+        .ctrl-btn { width: 70px; height: 50px; background: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="tamagotchiDevice">
-        <div id="lcdScreen">
-            <div class="screen-header">
-                <div>CẤP: <span id="val-lv">1</span></div>
-                <div>XP: <span id="val-xp">0</span>%</div>
-            </div>
+    <div id="gameConsole">
+        <div id="hudTop">
+            <div>CẤP: <span id="val-lv">1</span> (<span id="val-xp">0</span>%)</div>
+            <div class="coins-text">💰 VÀNG: <span id="val-coins">100</span></div>
+        </div>
+
+        <div id="statsHUD">
+            <div class="stat-bar-wrapper">🍕 ĐÓI: <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="background:#22c55e;"></div></div></div>
+            <div class="stat-bar-wrapper">🎉 VUI: <div class="bar-bg"><div id="bar-happy" class="bar-fill" style="background:#38bdf8;"></div></div></div>
+            <div class="stat-bar-wrapper">⚡ SỨC: <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="background:#eab308;"></div></div></div>
+            <div class="stat-bar-wrapper">🧼 SẠCH: <div class="bar-bg"><div id="bar-clean" class="bar-fill" style="background:#a855f7;"></div></div></div>
+        </div>
+
+        <div id="roomDisplay" onclick="clickPetDirectly()">
+            <div id="bubbleMsg">Meow! 🥰</div>
             
-            <div class="stats-grid">
-                <div>🍗ĐÓI: <span id="txt-hunger">100</span>%</div>
-                <div>🎉VUI: <span id="txt-happy">100</span>%</div>
-                <div>⚡SỨC: <span id="txt-energy">100</span>%</div>
-                <div>🧼SẠCH: <span id="txt-clean">100</span>%</div>
-            </div>
+            <img id="petAvatar" class="float-anim" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250" alt="Nhân vật">
+            
+            <div id="roomOverlay"></div>
 
-            <div id="petContainer">
-                <div id="dialogueBubble">Xin chào cậu! 🥰</div>
-                <img id="petAvatar" class="bounce-anim" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'><rect x='35' y='10' width='30' height='30' rx='15' fill='%23fbcfe8'/><rect x='25' y='45' width='50' height='70' rx='10' fill='%23ffffff'/><rect x='30' y='115' width='16' height='30' rx='5' fill='%23fce7f3'/><rect x='54' y='115' width='16' height='30' rx='5' fill='%23fce7f3'/><path d='M35,25 Q50,15 65,25' stroke='%231e293b' stroke-width='4' fill='none'/></svg>" alt="Nhân vật">
+            <div id="wardrobeSkin" style="display: flex;">
+                <div class="skin-dot" style="background: none;" onclick="changeSkin('none', event)">❌</div>
+                <div class="skin-dot" style="background: sepia(1);" onclick="changeSkin('sepia(1)', event)">🤎</div>
+                <div class="skin-dot" style="background: hue-rotate(90deg);" onclick="changeSkin('hue-rotate(90deg)', event)">💚</div>
+                <div class="skin-dot" style="background: invert(1);" onclick="changeSkin('invert(1)', event)">👽</div>
             </div>
         </div>
 
-        <div id="buttonPanel">
-            <button class="hardware-btn" id="btn-feed">🍗<br>ĂN</button>
-            <button class="hardware-btn" id="btn-play">🧸<br>CHƠI</button>
-            <button class="hardware-btn" id="btn-clean">🧼<br>TẮM</button>
-            <button class="hardware-btn" id="btn-sleep">💤<br>NGỦ</button>
+        <div id="roomNavigator">
+            <div class="nav-tab active" onclick="switchRoom('living')">🛋️<br><span style="font-size:9px;">KHÁCH</span></div>
+            <div class="nav-tab" onclick="switchRoom('kitchen')">🍳<br><span style="font-size:9px;">BẾP</span></div>
+            <div class="nav-tab" onclick="switchRoom('bathroom')">🛁<br><span style="font-size:9px;">TẮM</span></div>
+            <div class="nav-tab" onclick="switchRoom('bedroom')">🛏️<br><span style="font-size:9px;">NGỦ</span></div>
         </div>
 
-        <button id="resetBtn" onclick="resetGame()">HỒI SINH</button>
+        <div id="actionFooter">
+            <div class="action-sub-panel active" id="panel-living">
+                <button class="game-btn" onclick="openPopup('minigame')">🎮 CHƠI MINI-GAME</button>
+                <button class="game-btn btn-purple" onclick="openPopup('decor')">🖼️ ĐỔI NỀN NHÀ</button>
+            </div>
+            <div class="action-sub-panel" id="panel-kitchen">
+                <button class="game-btn btn-green" onclick="openPopup('shop')">🏪 MUA THỨC ĂN</button>
+                <button class="game-btn" onclick="feedQuick('🍎 Táo', 10)">🍎 ĂN TÁO</button>
+            </div>
+            <div class="action-sub-panel" id="panel-bathroom">
+                <button class="game-btn btn-purple" onclick="actionBathroom('shower')">🧼 TẮM XÀ BÔNG</button>
+                <button class="game-btn" onclick="actionBathroom('brush')">🪥 ĐÁNH RĂNG</button>
+            </div>
+            <div class="action-sub-panel" id="panel-bedroom">
+                <button class="game-btn btn-purple" id="btn-light" onclick="toggleLight()">💡 TẮT ĐÈN NGỦ</button>
+            </div>
+        </div>
+
+        <div class="overlay-popup" id="popup-shop">
+            <div class="popup-title">🏪 TỦ LẠNH THỨC ĂN XỊN</div>
+            <div class="items-list">
+                <div class="grid-item" onclick="buyFoodItem('Hamburger 🍔', 20, 25)">🍔 Hamburger<br><span style="color:#facc15;">💰 20 Vàng (+25 No)</span></div>
+                <div class="grid-item" onclick="buyFoodItem('Pizza 🍕', 30, 45)">🍕 Bánh Pizza<br><span style="color:#facc15;">💰 30 Vàng (+45 No)</span></div>
+                <div class="grid-item" onclick="buyFoodItem('Nước Ngọt 🥤', 10, 15)">🥤 Nước Ngọt<br><span style="color:#facc15;">💰 10 Vàng (+15 No)</span></div>
+                <div class="grid-item" onclick="buyFoodItem('Bánh Kem 🍰', 40, 65)">🍰 Bánh Kem Ly<br><span style="color:#facc15;">💰 40 Vàng (+65 No)</span></div>
+            </div>
+            <button class="game-btn btn-purple" onclick="closePopup('shop')">❌ ĐÓNG</button>
+        </div>
+
+        <div class="overlay-popup" id="popup-decor">
+            <div class="popup-title">🖼️ ĐỔI THIẾT KẾ NỘI THẤT</div>
+            <div class="items-list">
+                <div class="grid-item" onclick="buyDecor('linear-gradient(to bottom, #fef08a, #ca8a04)', 0)">🛋️ Phòng Khách Vàng Vỏ Chanh<br><span style="color:#22c55e;">Miễn phí</span></div>
+                <div class="grid-item" onclick="buyDecor('linear-gradient(to bottom, #a7f3d0, #047857)', 40)">🌿 Sân Vườn Sinh Thái<br><span style="color:#facc15;">💰 40 Vàng</span></div>
+                <div class="grid-item" onclick="buyDecor('linear-gradient(to bottom, #fbcfe8, #be185d)', 60)">🔮 Cung Điện Công Chúa Hồng<br><span style="color:#facc15;">💰 60 Vàng</span></div>
+                <div class="grid-item" onclick="buyDecor('linear-gradient(to bottom, #38bdf8, #1d4ed8)', 80)">🌌 Phòng Gaming Cyberpunk<br><span style="color:#facc15;">💰 80 Vàng</span></div>
+            </div>
+            <button class="game-btn btn-purple" onclick="closePopup('decor')">❌ ĐÓNG</button>
+        </div>
+
+        <div class="overlay-popup" id="popup-minigame">
+            <div class="popup-title">🎮 MINI-GAME: HỨNG TRÁI CÂY TRÚNG VÀNG</div>
+            <canvas id="miniGameCanvas"></canvas>
+            <div id="miniGameControls">
+                <div class="ctrl-btn" id="m-left">◀</div>
+                <div class="ctrl-btn" id="m-right">▶</div>
+            </div>
+            <button class="game-btn btn-purple" style="margin-top:10px;" onclick="closeMiniGame()">❌ THOÁT GAME & NHẬN THƯỞNG</button>
+        </div>
     </div>
 
     <script>
-        const avatarImg = document.getElementById("petAvatar");
-        
-        // Link ảnh góc chụp người của cậu sau khi được xử lý cắt gọn
-        const userPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250"; 
-        avatarImg.src = userPhotoUrl;
+        const avatar = document.getElementById("petAvatar");
+        const roomView = document.getElementById("roomDisplay");
+        const overlay = document.getElementById("roomOverlay");
 
-        let pet = {
-            level: 1, xp: 0,
-            hunger: 100, happy: 100, energy: 100, clean: 100,
-            isSleeping: false, isSick: false, isDead: false,
-            actionState: "IDLE"
+        // Dữ liệu cốt lõi có Save Game
+        let data = {
+            level: 1, xp: 0, coins: 100,
+            hunger: 80, happy: 80, energy: 80, clean: 80,
+            currentRoom: 'living', skinFilter: 'none',
+            bgStyle: 'linear-gradient(to bottom, #fef08a, #ca8a04)'
         };
 
-        document.addEventListener("DOMContentLoaded", () => {
-            bindControl("btn-feed", feedPet);
-            bindControl("btn-play", playWithPet);
-            bindControl("btn-clean", cleanPet);
-            bindControl("btn-sleep", toggleSleepPet);
-            bindControl("petAvatar", touchPetDirectly);
+        let isSleepingMode = false;
+        
+        // Cấu hình MiniGame quả rơi
+        const canvas = document.getElementById("miniGameCanvas");
+        const ctx = canvas.getContext("2d");
+        let gameLoopInterval, items = [], basketX = 100, score = 0, isPlaying = false;
+        let pressLeft = false, pressRight = false;
 
-            // Giảm chỉ số tự động sau mỗi 3 giây
-            setInterval(petStatDecay, 3000);
+        document.addEventListener("DOMContentLoaded", () => {
+            // Tải dữ liệu cũ nếu có
+            if(localStorage.getItem("talking_tom_save")) {
+                data = JSON.parse(localStorage.getItem("talking_tom_save"));
+            }
+            // Thiết lập trạng thái ban đầu
+            applyLoadedData();
+            
+            // Lắng nghe nút bấm di chuyển MiniGame
+            setupButtonCtrl("m-left", (st) => pressLeft = st);
+            setupButtonCtrl("m-right", (st) => pressRight = st);
+
+            // Tiêu hao chỉ số sinh tồn sau 3 giây
+            setInterval(decayStatsRealTime, 3000);
         });
 
-        function bindControl(id, callback) {
-            const btn = document.getElementById(id);
-            btn.addEventListener("touchstart", (e) => { e.preventDefault(); callback(); });
-            btn.addEventListener("click", (e) => { e.preventDefault(); callback(); });
+        function saveGame() {
+            localStorage.setItem("talking_tom_save", JSON.stringify(data));
         }
 
-        function triggerBubble(text) {
-            const b = document.getElementById("dialogueBubble");
-            b.innerText = text; b.style.display = "block";
+        function applyLoadedData() {
+            updateHUD();
+            switchRoom(data.currentRoom);
+            avatar.style.filter = data.skinFilter;
+        }
+
+        function updateHUD() {
+            document.getElementById("val-lv").innerText = data.level;
+            document.getElementById("val-xp").innerText = data.xp;
+            document.getElementById("val-coins").innerText = data.coins;
+            
+            document.getElementById("bar-hunger").style.width = data.hunger + "%";
+            document.getElementById("bar-happy").style.width = data.happy + "%";
+            document.getElementById("bar-energy").style.width = data.energy + "%";
+            document.getElementById("bar-clean").style.width = data.clean + "%";
+        }
+
+        function showMessage(msg) {
+            const b = document.getElementById("bubbleMsg");
+            b.innerText = msg; b.style.display = "block";
             setTimeout(() => b.style.display = "none", 1600);
         }
 
-        function feedPet() {
-            if (checkCantAction()) return;
-            if (pet.hunger >= 100) { triggerBubble("No bụng rồi cậu ơi! 🍧"); return; }
+        // CHUYỂN ĐỔI 4 PHÒNG CHỨC NĂNG CHUẨN TOM
+        function switchRoom(roomName) {
+            if (isSleepingMode && roomName !== 'bedroom') {
+                showMessage("Suỵt! Nhân vật đang ngủ, không chuyển phòng được! 💤");
+                return;
+            }
+
+            data.currentRoom = roomName;
             
-            pet.actionState = "EATING";
-            pet.hunger = Math.min(100, pet.hunger + 25);
-            pet.clean = Math.max(0, pet.clean - 10);
-            gainExperience(15);
-            triggerBubble("Măm măm ngon quá! 🍰");
+            // Cập nhật giao diện thanh chuyển phòng
+            const tabs = document.querySelectorAll(".nav-tab");
+            tabs.forEach(t => t.classList.remove("active"));
             
-            avatarImg.style.transform = "scale(1.3) translateY(5px)";
-            setTimeout(() => { 
-                avatarImg.style.transform = "none";
-                pet.actionState = "IDLE"; 
-            }, 1200);
-            updateDOMStats();
-        }
+            // Ẩn tất cả bảng điều khiển phụ
+            document.getElementById("panel-living").classList.remove("active");
+            document.getElementById("panel-kitchen").classList.remove("active");
+            document.getElementById("panel-bathroom").classList.remove("active");
+            document.getElementById("panel-bedroom").classList.remove("active");
 
-        function playWithPet() {
-            if (checkCantAction()) return;
-            if (pet.energy <= 20) { triggerBubble("Mệt quá, cho tớ đi ngủ! 💤"); return; }
-
-            pet.actionState = "PLAYING";
-            pet.happy = Math.min(100, pet.happy + 25);
-            pet.energy = Math.max(0, pet.energy - 15);
-            gainExperience(20);
-            triggerBubble("Zui quá trời ơi! 🎈");
-
-            avatarImg.className = "spin-anim";
-            setTimeout(() => { 
-                avatarImg.className = "bounce-anim";
-                pet.actionState = "IDLE"; 
-            }, 1200);
-            updateDOMStats();
-        }
-
-        function cleanPet() {
-            if (checkCantAction()) return;
-            if (pet.clean >= 100) { triggerBubble("Sạch sẽ thơm tho rồi! ✨"); return; }
-
-            pet.actionState = "SHOWERING";
-            pet.clean = 100;
-            triggerBubble("Xà bông mát mẻ quá! 🧼");
-            updateDOMStats();
-        }
-
-        function toggleSleepPet() {
-            if (pet.isDead) return;
-            const screen = document.getElementById("lcdScreen");
-
-            if (!pet.isSleeping) {
-                pet.isSleeping = true;
-                screen.classList.add("sleep-mode");
-                triggerBubble("Khò khò... Zzz 🌙");
-            } else {
-                pet.isSleeping = false;
-                screen.classList.remove("sleep-mode");
-                triggerBubble("Thức dậy năng lượng! ☀️");
+            // Thay đổi hình nền phòng khách/phòng ngủ/bếp theo đúng chuẩn tông màu
+            if(roomName === 'living') {
+                tabs[0].classList.add("active");
+                document.getElementById("panel-living").classList.add("active");
+                roomView.style.background = data.bgStyle;
+                document.getElementById("wardrobeSkin").style.display = "flex";
+            } else if(roomName === 'kitchen') {
+                tabs[1].classList.add("active");
+                document.getElementById("panel-kitchen").classList.add("active");
+                roomView.style.background = "linear-gradient(to bottom, #ffedd5, #f97316)"; // Cam nhà bếp
+                document.getElementById("wardrobeSkin").style.display = "none";
+            } else if(roomName === 'bathroom') {
+                tabs[2].classList.add("active");
+                document.getElementById("panel-bathroom").classList.add("active");
+                roomView.style.background = "linear-gradient(to bottom, #e0f2fe, #0284c7)"; // Xanh biển nhà tắm
+                document.getElementById("wardrobeSkin").style.display = "none";
+            } else if(roomName === 'bedroom') {
+                tabs[3].classList.add("active");
+                document.getElementById("panel-bedroom").classList.add("active");
+                roomView.style.background = isSleepingMode ? "linear-gradient(to bottom, #020617, #1e1b4b)" : "linear-gradient(to bottom, #ddd6fe, #6d28d9)"; // Tím phòng ngủ
+                document.getElementById("wardrobeSkin").style.display = "none";
             }
-            updateDOMStats();
+            saveGame();
         }
 
-        function touchPetDirectly() {
-            if (checkCantAction()) return;
-            pet.happy = Math.min(100, pet.happy + 5);
-            triggerBubble("Hi hi nhột quá cậu! 🥰");
-            updateDOMStats();
+        // TƯƠNG TÁC CHẠM VÀO NGƯỜI
+        function clickPetDirectly() {
+            if (isSleepingMode) return;
+            data.happy = Math.min(100, data.happy + 5);
+            showMessage("Hi hi cậu nựng tớ nhột quá! 🥰");
+            triggerAnimate("scale(1.15) rotate(5deg)");
+            updateHUD();
+            saveGame();
         }
 
-        function checkCantAction() {
-            if (pet.isDead) { triggerBubble("Nhân vật đã kiệt sức 😢"); return true; }
-            if (pet.isSleeping) { triggerBubble("Suỵt! Đang ngủ ngon... 💤"); return true; }
-            return false;
+        // PHÒNG KHÁCH: ĐỔI MÀU DA (SKIN)
+        function changeSkin(filterStyle, event) {
+            event.stopPropagation(); // Không kích hoạt chạm vào người
+            data.skinFilter = filterStyle;
+            avatar.style.filter = filterStyle;
+            showMessage("Oa! Diện mạo mới cá tính chưa này! ✨");
+            saveGame();
         }
 
-        function gainExperience(amount) {
-            if (pet.isDead) return;
-            pet.xp += amount;
-            if (pet.xp >= 100) {
-                pet.xp = 0; pet.level++;
-                triggerBubble("🎉 CHÚC MỪNG LÊN LEVEL " + pet.level + "!");
-            }
-            updateDOMStats();
+        // PHÒNG KHÁCH: THAY ĐỔI NỘI THẤT NỀN
+        function buyDecor(bgCss, price) {
+            if(data.coins < price) { addMessage("Cậu không đủ Tiền Vàng rồi! 🪙"); return; }
+            data.coins -= price;
+            data.bgStyle = bgCss;
+            roomView.style.background = bgCss;
+            showMessage("Đã đổi thiết kế nội thất phòng khách! 🛋️");
+            closePopup('decor');
+            updateHUD();
+            saveGame();
         }
 
-        function petStatDecay() {
-            if (pet.isDead) return;
-
-            if (pet.isSleeping) {
-                pet.energy = Math.min(100, pet.energy + 12);
-                pet.hunger = Math.max(0, pet.hunger - 3);
-            } else {
-                pet.hunger = Math.max(0, pet.hunger - 5);
-                pet.happy = Math.max(0, pet.happy - 4);
-                pet.energy = Math.max(0, pet.energy - 3);
-                pet.clean = Math.max(0, pet.clean - 2);
-            }
-
-            if (pet.hunger <= 0 || pet.happy <= 0 || pet.energy <= 0) {
-                pet.isDead = true;
-                avatarImg.style.transform = "rotate(90deg) scale(0.8)";
-                avatarImg.style.filter = "grayscale(1)";
-                triggerBubble("Kiệt sức rồi, bấm Hồi Sinh nha 🪦");
-            }
-            updateDOMStats();
+        // PHÒNG BẾP: CHO ĂN NHANH VÀ MUA ĐỒ ĂN
+        function feedQuick(name, val) {
+            if(data.hunger >= 100) { showMessage("No lắm rồi cậu ơi! 🥞"); return; }
+            data.hunger = Math.min(100, data.hunger + val);
+            gainXPValue(10);
+            showMessage(`Nhoàm nhoàm... Món ${name} ngon đỉnh! 🍎`);
+            triggerAnimate("translateY(15px) scaleX(1.2)");
+            updateHUD();
+            saveGame();
         }
 
-        function updateDOMStats() {
-            document.getElementById("val-lv").innerText = pet.level;
-            document.getElementById("val-xp").innerText = pet.xp;
-            document.getElementById("txt-hunger").innerText = pet.hunger;
-            document.getElementById("txt-happy").innerText = pet.happy;
-            document.getElementById("txt-energy").innerText = pet.energy;
-            document.getElementById("txt-clean").innerText = pet.clean;
+        function buyFoodItem(name, price, val) {
+            if(data.coins < price) { showMessage("Thiếu Tiền Vàng rồi cậu ơi! 🪙"); return; }
+            if(data.hunger >= 100) { showMessage("Nhân vật đang no, đừng ép ăn tiếp! 🍔"); return; }
+            data.coins -= price;
+            data.hunger = Math.min(100, data.hunger + val);
+            gainXPValue(20);
+            showMessage(`Đã chi tiền mua ${name} ăn siêu đã! 🍕`);
+            updateHUD();
+            saveGame();
         }
 
-        function resetGame() {
-            pet = {
-                level: 1, xp: 0,
-                hunger: 100, happy: 100, energy: 100, clean: 100,
-                isSleeping: false, isSick: false, isDead: false,
-                actionState: "IDLE"
-            };
-            document.getElementById("lcdScreen").classList.remove("sleep-mode");
-            avatarImg.className = "bounce-anim";
-            avatarImg.style.transform = "none";
-            avatarImg.style.filter = "none";
-            triggerBubble("Bắt đầu màn chơi mới! 🚀");
-            updateDOMStats();
-        }
-    </script>
-</body>
-  </html>
-  
+        // PHÒNG TẮM: TẮM VÀ ĐÁNH RĂNG
+        function actionBathroom(type) {
+            if(type === 'shower') {
+                data.clean = 100;
+                overlay.style.background = "rgba(56, 189, 248, 0.3)";
+                showMessage("Kỳ cọ bong bóng mát mẻ quá xá! 🧼");
+                setTimeout(() => overlay.style.background = "none", 1500);
+            } else if(type === 'brush') {
+                da
