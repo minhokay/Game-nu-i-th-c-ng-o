@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuôi vk - Phiên Bản Đặc Biệt</title>
+    <style>
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #1e293b;
+            font-family: 'Courier New', Courier, monospace; user-select: none;
+            display: flex; justify-content: center; align-items: center;
+            touch-action: none;
+        }
+
+        /* Vỏ máy Tamagotchi cổ điển */
+        #tamagotchiDevice {
+            width: 340px; height: 500px;
+            background: linear-gradient(135deg, #06b6d4, #0891b2); /* Màu xanh thẫm cá tính */
+            border-radius: 50% 50% 45% 45% / 45% 45% 55% 55%;
+            border: 8px solid #0e7490;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset -10px -10px 15px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 20px; box-sizing: border-box; position: relative;
+        }
+
+        /* Màn hình LCD hiển thị game */
+        #lcdScreen {
+            width: 230px; height: 210px;
+            background: #e2e8f0; /* Màn hình xám sáng hiện đại */
+            border: 6px solid #475569; border-radius: 10px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+            position: relative; display: flex; flex-direction: column;
+            justify-content: space-between; padding: 10px; box-sizing: border-box;
+            color: #1e293b; transition: background 0.4s, color 0.4s;
+        }
+
+        /* Chế độ ban đêm khi đi ngủ */
+        #lcdScreen.sleep-mode { background: #1e1b4b; color: #93c5fd; }
+        #lcdScreen.sleep-mode #petAvatar { filter: brightness(0.5); }
+
+        .screen-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; margin-top: 4px; font-weight: bold;}
+        
+        /* Vùng chứa nhân vật */
+        #petContainer {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            position: relative; width: 100%; overflow: hidden;
+        }
+
+        /* Ảnh nhân vật gốc từ ảnh chụp của cậu */
+        #petAvatar {
+            width: auto; height: 110px;
+            object-fit: contain;
+            transition: transform 0.1s;
+        }
+
+        /* Hiệu ứng hoạt họa nhún nhảy sinh động */
+        .bounce-anim { animation: petBounce 0.5s ease infinite alternate; }
+        @keyframes petBounce {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-10px) scale(1.03); }
+        }
+
+        /* Hiệu ứng xoay tròn khi đang chơi đùa kích thích */
+        .spin-anim { animation: petSpin 0.5s linear infinite; }
+        @keyframes petSpin {
+            100% { transform: rotate(360deg); }
+        }
+
+        #dialogueBubble {
+            position: absolute; top: 5px; background: rgba(255,255,255,0.95);
+            color: #000; padding: 4px 8px; border-radius: 8px; font-size: 11px;
+            font-weight: bold; display: none; text-align: center; max-width: 90%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5;
+        }
+
+        /* Hệ thống nút bấm bo tròn */
+        #buttonPanel {
+            display: flex; justify-content: space-around; width: 90%; margin-top: 35px; gap: 10px;
+        }
+        .hardware-btn {
+            width: 52px; height: 52px; background: #f43f5e; /* Nút hồng nổi bật */
+            border: none; border-radius: 50%;
+            box-shadow: 0 4px 0 #be185d, 0 6px 10px rgba(0,0,0,0.3);
+            cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 10px; font-weight: bold; color: white;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hardware-btn:active {
+            transform: translateY(4px); box-shadow: 0 0px 0 #be185d, 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        #resetBtn {
+            position: absolute; bottom: 12px; font-size: 10px; background: #64748b;
+            color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tamagotchiDevice">
+        <div id="lcdScreen">
+            <div class="screen-header">
+                <div>CẤP: <span id="val-lv">1</span></div>
+                <div>XP: <span id="val-xp">0</span>%</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div>🍗ĐÓI: <span id="txt-hunger">100</span>%</div>
+                <div>🎉VUI: <span id="txt-happy">100</span>%</div>
+                <div>⚡SỨC: <span id="txt-energy">100</span>%</div>
+                <div>🧼SẠCH: <span id="txt-clean">100</span>%</div>
+            </div>
+
+            <div id="petContainer">
+                <div id="dialogueBubble">Xin chào cậu! 🥰</div>
+                <img id="petAvatar" class="bounce-anim" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='150' viewBox='0 0 100 150'><rect x='35' y='10' width='30' height='30' rx='15' fill='%23fbcfe8'/><rect x='25' y='45' width='50' height='70' rx='10' fill='%23ffffff'/><rect x='30' y='115' width='16' height='30' rx='5' fill='%23fce7f3'/><rect x='54' y='115' width='16' height='30' rx='5' fill='%23fce7f3'/><path d='M35,25 Q50,15 65,25' stroke='%231e293b' stroke-width='4' fill='none'/></svg>" alt="Nhân vật">
+            </div>
+        </div>
+
+        <div id="buttonPanel">
+            <button class="hardware-btn" id="btn-feed">🍗<br>ĂN</button>
+            <button class="hardware-btn" id="btn-play">🧸<br>CHƠI</button>
+            <button class="hardware-btn" id="btn-clean">🧼<br>TẮM</button>
+            <button class="hardware-btn" id="btn-sleep">💤<br>NGỦ</button>
+        </div>
+
+        <button id="resetBtn" onclick="resetGame()">HỒI SINH</button>
+    </div>
+
+    <script>
+        const avatarImg = document.getElementById("petAvatar");
+        
+        // Link ảnh góc chụp người của cậu sau khi được xử lý cắt gọn
+        const userPhotoUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250"; 
+        avatarImg.src = userPhotoUrl;
+
+        let pet = {
+            level: 1, xp: 0,
+            hunger: 100, happy: 100, energy: 100, clean: 100,
+            isSleeping: false, isSick: false, isDead: false,
+            actionState: "IDLE"
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            bindControl("btn-feed", feedPet);
+            bindControl("btn-play", playWithPet);
+            bindControl("btn-clean", cleanPet);
+            bindControl("btn-sleep", toggleSleepPet);
+            bindControl("petAvatar", touchPetDirectly);
+
+            // Giảm chỉ số tự động sau mỗi 3 giây
+            setInterval(petStatDecay, 3000);
+        });
+
+        function bindControl(id, callback) {
+            const btn = document.getElementById(id);
+            btn.addEventListener("touchstart", (e) => { e.preventDefault(); callback(); });
+            btn.addEventListener("click", (e) => { e.preventDefault(); callback(); });
+        }
+
+        function triggerBubble(text) {
+            const b = document.getElementById("dialogueBubble");
+            b.innerText = text; b.style.display = "block";
+            setTimeout(() => b.style.display = "none", 1600);
+        }
+
+        function feedPet() {
+            if (checkCantAction()) return;
+            if (pet.hunger >= 100) { triggerBubble("No bụng rồi cậu ơi! 🍧"); return; }
+            
+            pet.actionState = "EATING";
+            pet.hunger = Math.min(100, pet.hunger + 25);
+            pet.clean = Math.max(0, pet.clean - 10);
+            gainExperience(15);
+            triggerBubble("Măm măm ngon quá! 🍰");
+            
+            avatarImg.style.transform = "scale(1.3) translateY(5px)";
+            setTimeout(() => { 
+                avatarImg.style.transform = "none";
+                pet.actionState = "IDLE"; 
+            }, 1200);
+            updateDOMStats();
+        }
+
+        function playWithPet() {
+            if (checkCantAction()) return;
+            if (pet.energy <= 20) { triggerBubble("Mệt quá, cho tớ đi ngủ! 💤"); return; }
+
+            pet.actionState = "PLAYING";
+            pet.happy = Math.min(100, pet.happy + 25);
+            pet.energy = Math.max(0, pet.energy - 15);
+            gainExperience(20);
+            triggerBubble("Zui quá trời ơi! 🎈");
+
+            avatarImg.className = "spin-anim";
+            setTimeout(() => { 
+                avatarImg.className = "bounce-anim";
+                pet.actionState = "IDLE"; 
+            }, 1200);
+            updateDOMStats();
+        }
+
+        function cleanPet() {
+            if (checkCantAction()) return;
+            if (pet.clean >= 100) { triggerBubble("Sạch sẽ thơm tho rồi! ✨"); return; }
+
+            pet.actionState = "SHOWERING";
+            pet.clean = 100;
+            triggerBubble("Xà bông mát mẻ quá! 🧼");
+            updateDOMStats();
+        }
+
+        function toggleSleepPet() {
+            if (pet.isDead) return;
+            const screen = document.getElementById("lcdScreen");
+
+            if (!pet.isSleeping) {
+                pet.isSleeping = true;
+                screen.classList.add("sleep-mode");
+                triggerBubble("Khò khò... Zzz 🌙");
+            } else {
+                pet.isSleeping = false;
+                screen.classList.remove("sleep-mode");
+                triggerBubble("Thức dậy năng lượng! ☀️");
+            }
+            updateDOMStats();
+        }
+
+        function touchPetDirectly() {
+            if (checkCantAction()) return;
+            pet.happy = Math.min(100, pet.happy + 5);
+            triggerBubble("Hi hi nhột quá cậu! 🥰");
+            updateDOMStats();
+        }
+
+        function checkCantAction() {
+            if (pet.isDead) { triggerBubble("Nhân vật đã kiệt sức 😢"); return true; }
+            if (pet.isSleeping) { triggerBubble("Suỵt! Đang ngủ ngon... 💤"); return true; }
+            return false;
+        }
+
+        function gainExperience(amount) {
+            if (pet.isDead) return;
+            pet.xp += amount;
+            if (pet.xp >= 100) {
+                pet.xp = 0; pet.level++;
+                triggerBubble("🎉 CHÚC MỪNG LÊN LEVEL " + pet.level + "!");
+            }
+            updateDOMStats();
+        }
+
+        function petStatDecay() {
+            if (pet.isDead) return;
+
+            if (pet.isSleeping) {
+                pet.energy = Math.min(100, pet.energy + 12);
+                pet.hunger = Math.max(0, pet.hunger - 3);
+            } else {
+                pet.hunger = Math.max(0, pet.hunger - 5);
+                pet.happy = Math.max(0, pet.happy - 4);
+                pet.energy = Math.max(0, pet.energy - 3);
+                pet.clean = Math.max(0, pet.clean - 2);
+            }
+
+            if (pet.hunger <= 0 || pet.happy <= 0 || pet.energy <= 0) {
+                pet.isDead = true;
+                avatarImg.style.transform = "rotate(90deg) scale(0.8)";
+                avatarImg.style.filter = "grayscale(1)";
+                triggerBubble("Kiệt sức rồi, bấm Hồi Sinh nha 🪦");
+            }
+            updateDOMStats();
+        }
+
+        function updateDOMStats() {
+            document.getElementById("val-lv").innerText = pet.level;
+            document.getElementById("val-xp").innerText = pet.xp;
+            document.getElementById("txt-hunger").innerText = pet.hunger;
+            document.getElementById("txt-happy").innerText = pet.happy;
+            document.getElementById("txt-energy").innerText = pet.energy;
+            document.getElementById("txt-clean").innerText = pet.clean;
+        }
+
+        function resetGame() {
+            pet = {
+                level: 1, xp: 0,
+                hunger: 100, happy: 100, energy: 100, clean: 100,
+                isSleeping: false, isSick: false, isDead: false,
+                actionState: "IDLE"
+            };
+            document.getElementById("lcdScreen").classList.remove("sleep-mode");
+            avatarImg.className = "bounce-anim";
+            avatarImg.style.transform = "none";
+            avatarImg.style.filter = "none";
+            triggerBubble("Bắt đầu màn chơi mới! 🚀");
+            updateDOMStats();
+        }
+    </script>
+</body>
+  </html>
+  
