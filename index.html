@@ -12,8 +12,6 @@
             display: flex; justify-content: center; align-items: center;
             touch-action: none; color: #fff;
         }
-
-        /* Khung máy chơi game dọc di động */
         #gameConsole {
             width: 100%; max-width: 420px; height: 100%; max-height: 750px;
             background: linear-gradient(135deg, #1e1b4b, #311042);
@@ -21,16 +19,12 @@
             display: flex; flex-direction: column; justify-content: space-between;
             position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
-
-        /* Thanh HUD chỉ số phía trên cùng */
         #hudTop {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(15, 23, 42, 0.85); padding: 8px 15px;
             font-size: 13px; font-weight: bold; border-bottom: 2px solid #38bdf8; z-index: 10;
         }
         .coins-text { color: #facc15; display: flex; align-items: center; gap: 4px; }
-
-        /* Bảng hiển thị 4 thanh trạng thái sinh tồn */
         #statsHUD {
             display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
             padding: 8px 12px; background: rgba(30, 41, 59, 0.7);
@@ -39,44 +33,31 @@
         .stat-bar-wrapper { display: flex; align-items: center; justify-content: space-between; }
         .bar-bg { width: 60%; height: 10px; background: #475569; border-radius: 5px; overflow: hidden; }
         .bar-fill { height: 100%; width: 100%; transition: width 0.3s; }
-
-        /* KHU VỰC HIỂN THỊ CHÍNH (THAY ĐỔI THEO PHÒNG) */
         #roomDisplay {
             flex: 1; position: relative; display: flex; justify-content: center;
             align-items: center; transition: background 0.5s;
-            /* Mặc định Phòng khách màu ấm */
             background: linear-gradient(to bottom, #fef08a, #ca8a04);
         }
-        
-        /* Định dạng ảnh nhân vật của cậu */
         #petAvatar {
             height: 160px; width: auto; object-fit: contain; z-index: 5;
             transition: transform 0.2s, filter 0.3s;
         }
         .float-anim { animation: float 0.6s ease infinite alternate; }
         @keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
-
-        /* Tủ đồ thay màu da/tóc cho nhân vật */
         #wardrobeSkin {
             position: absolute; bottom: 20px; background: rgba(0,0,0,0.7);
             padding: 6px 12px; border-radius: 20px; display: flex; gap: 8px; z-index: 6;
         }
         .skin-dot { width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
-
-        /* Bong bóng thoại thoại */
         #bubbleMsg {
             position: absolute; top: 15%; background: white; color: black;
             padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;
             display: none; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 8;
         }
-
-        /* Hệ thống Đèn ngủ / Các hiệu ứng phòng tắm */
         #roomOverlay {
             position: absolute; width: 100%; height: 100%; top: 0; left: 0;
             pointer-events: none; z-index: 7; transition: background 0.5s;
         }
-
-        /* THANH ĐIỀU HƯỚNG CHUYỂN PHÒNG (DƯỚI MÀN HÌNH CHÍNH) */
         #roomNavigator {
             display: grid; grid-template-columns: repeat(4, 1fr);
             background: #1e293b; border-top: 2px solid #475569; z-index: 10;
@@ -86,15 +67,12 @@
             border-bottom: 4px solid transparent; opacity: 0.6; transition: all 0.2s;
         }
         .nav-tab.active { opacity: 1; border-bottom-color: #38bdf8; background: #0f172a; }
-
-        /* THANH HÀNH ĐỘNG DƯỚI CÙNG THEO TỪNG PHÒNG */
         #actionFooter {
             background: #0f172a; padding: 12px; min-height: 60px;
             display: flex; justify-content: center; align-items: center; z-index: 10;
         }
         .action-sub-panel { display: none; width: 100%; justify-content: space-around; gap: 8px; }
         .action-sub-panel.active { display: flex; }
-        
         .game-btn {
             background: #38bdf8; border: none; padding: 10px 14px; color: white;
             font-weight: bold; font-size: 12px; border-radius: 12px; cursor: pointer;
@@ -105,8 +83,6 @@
         .btn-purple:active { box-shadow: 0 2px 0 #7e22ce; }
         .btn-green { background: #22c55e; box-shadow: 0 4px 0 #16a34a; }
         .btn-green:active { box-shadow: 0 2px 0 #16a34a; }
-
-        /* POPUP LỚN: CỬA HÀNG VÀ MINI-GAME OVERLAY */
         .overlay-popup {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.96); z-index: 100; display: none;
@@ -119,50 +95,40 @@
             padding: 10px; text-align: center; font-size: 12px; cursor: pointer;
         }
         .grid-item:active { border-color: #facc15; }
-
-        /* Mini-game Canvas */
         #miniGameCanvas { width: 100%; background: #020617; border-radius: 12px; flex: 1; }
         #miniGameControls { display: flex; justify-content: space-between; margin-top: 10px; width: 100%; }
         .ctrl-btn { width: 70px; height: 50px; background: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
     </style>
 </head>
 <body>
-
     <div id="gameConsole">
         <div id="hudTop">
             <div>CẤP: <span id="val-lv">1</span> (<span id="val-xp">0</span>%)</div>
             <div class="coins-text">💰 VÀNG: <span id="val-coins">100</span></div>
         </div>
-
         <div id="statsHUD">
             <div class="stat-bar-wrapper">🍕 ĐÓI: <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="background:#22c55e;"></div></div></div>
             <div class="stat-bar-wrapper">🎉 VUI: <div class="bar-bg"><div id="bar-happy" class="bar-fill" style="background:#38bdf8;"></div></div></div>
             <div class="stat-bar-wrapper">⚡ SỨC: <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="background:#eab308;"></div></div></div>
             <div class="stat-bar-wrapper">🧼 SẠCH: <div class="bar-bg"><div id="bar-clean" class="bar-fill" style="background:#a855f7;"></div></div></div>
         </div>
-
         <div id="roomDisplay" onclick="clickPetDirectly()">
             <div id="bubbleMsg">Meow! 🥰</div>
-            
             <img id="petAvatar" class="float-anim" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250" alt="Nhân vật">
-            
             <div id="roomOverlay"></div>
-
-            <div id="wardrobeSkin" style="display: flex;">
+            <div id="wardrobeSkin">
                 <div class="skin-dot" style="background: none;" onclick="changeSkin('none', event)">❌</div>
                 <div class="skin-dot" style="background: sepia(1);" onclick="changeSkin('sepia(1)', event)">🤎</div>
                 <div class="skin-dot" style="background: hue-rotate(90deg);" onclick="changeSkin('hue-rotate(90deg)', event)">💚</div>
                 <div class="skin-dot" style="background: invert(1);" onclick="changeSkin('invert(1)', event)">👽</div>
             </div>
         </div>
-
         <div id="roomNavigator">
             <div class="nav-tab active" onclick="switchRoom('living')">🛋️<br><span style="font-size:9px;">KHÁCH</span></div>
             <div class="nav-tab" onclick="switchRoom('kitchen')">🍳<br><span style="font-size:9px;">BẾP</span></div>
             <div class="nav-tab" onclick="switchRoom('bathroom')">🛁<br><span style="font-size:9px;">TẮM</span></div>
             <div class="nav-tab" onclick="switchRoom('bedroom')">🛏️<br><span style="font-size:9px;">NGỦ</span></div>
         </div>
-
         <div id="actionFooter">
             <div class="action-sub-panel active" id="panel-living">
                 <button class="game-btn" onclick="openPopup('minigame')">🎮 CHƠI MINI-GAME</button>
@@ -180,7 +146,6 @@
                 <button class="game-btn btn-purple" id="btn-light" onclick="toggleLight()">💡 TẮT ĐÈN NGỦ</button>
             </div>
         </div>
-
         <div class="overlay-popup" id="popup-shop">
             <div class="popup-title">🏪 TỦ LẠNH THỨC ĂN XỊN</div>
             <div class="items-list">
@@ -191,7 +156,6 @@
             </div>
             <button class="game-btn btn-purple" onclick="closePopup('shop')">❌ ĐÓNG</button>
         </div>
-
         <div class="overlay-popup" id="popup-decor">
             <div class="popup-title">🖼️ ĐỔI THIẾT KẾ NỘI THẤT</div>
             <div class="items-list">
@@ -202,7 +166,6 @@
             </div>
             <button class="game-btn btn-purple" onclick="closePopup('decor')">❌ ĐÓNG</button>
         </div>
-
         <div class="overlay-popup" id="popup-minigame">
             <div class="popup-title">🎮 MINI-GAME: HỨNG TRÁI CÂY TRÚNG VÀNG</div>
             <canvas id="miniGameCanvas"></canvas>
@@ -212,14 +175,12 @@
             </div>
             <button class="game-btn btn-purple" style="margin-top:10px;" onclick="closeMiniGame()">❌ THOÁT GAME & NHẬN THƯỞNG</button>
         </div>
-    </div>
-
-    <script>
+                                                                                                                                                      </div>
+                                                                                                                                                          <script>
         const avatar = document.getElementById("petAvatar");
         const roomView = document.getElementById("roomDisplay");
         const overlay = document.getElementById("roomOverlay");
 
-        // Dữ liệu cốt lõi có Save Game
         let data = {
             level: 1, xp: 0, coins: 100,
             hunger: 80, happy: 80, energy: 80, clean: 80,
@@ -228,26 +189,18 @@
         };
 
         let isSleepingMode = false;
-        
-        // Cấu hình MiniGame quả rơi
         const canvas = document.getElementById("miniGameCanvas");
         const ctx = canvas.getContext("2d");
         let gameLoopInterval, items = [], basketX = 100, score = 0, isPlaying = false;
         let pressLeft = false, pressRight = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Tải dữ liệu cũ nếu có
             if(localStorage.getItem("talking_tom_save")) {
                 data = JSON.parse(localStorage.getItem("talking_tom_save"));
             }
-            // Thiết lập trạng thái ban đầu
             applyLoadedData();
-            
-            // Lắng nghe nút bấm di chuyển MiniGame
             setupButtonCtrl("m-left", (st) => pressLeft = st);
             setupButtonCtrl("m-right", (st) => pressRight = st);
-
-            // Tiêu hao chỉ số sinh tồn sau 3 giây
             setInterval(decayStatsRealTime, 3000);
         });
 
@@ -265,7 +218,6 @@
             document.getElementById("val-lv").innerText = data.level;
             document.getElementById("val-xp").innerText = data.xp;
             document.getElementById("val-coins").innerText = data.coins;
-            
             document.getElementById("bar-hunger").style.width = data.hunger + "%";
             document.getElementById("bar-happy").style.width = data.happy + "%";
             document.getElementById("bar-energy").style.width = data.energy + "%";
@@ -278,26 +230,20 @@
             setTimeout(() => b.style.display = "none", 1600);
         }
 
-        // CHUYỂN ĐỔI 4 PHÒNG CHỨC NĂNG CHUẨN TOM
         function switchRoom(roomName) {
             if (isSleepingMode && roomName !== 'bedroom') {
                 showMessage("Suỵt! Nhân vật đang ngủ, không chuyển phòng được! 💤");
                 return;
             }
-
             data.currentRoom = roomName;
-            
-            // Cập nhật giao diện thanh chuyển phòng
             const tabs = document.querySelectorAll(".nav-tab");
             tabs.forEach(t => t.classList.remove("active"));
             
-            // Ẩn tất cả bảng điều khiển phụ
             document.getElementById("panel-living").classList.remove("active");
             document.getElementById("panel-kitchen").classList.remove("active");
             document.getElementById("panel-bathroom").classList.remove("active");
             document.getElementById("panel-bedroom").classList.remove("active");
 
-            // Thay đổi hình nền phòng khách/phòng ngủ/bếp theo đúng chuẩn tông màu
             if(roomName === 'living') {
                 tabs[0].classList.add("active");
                 document.getElementById("panel-living").classList.add("active");
@@ -306,23 +252,22 @@
             } else if(roomName === 'kitchen') {
                 tabs[1].classList.add("active");
                 document.getElementById("panel-kitchen").classList.add("active");
-                roomView.style.background = "linear-gradient(to bottom, #ffedd5, #f97316)"; // Cam nhà bếp
+                roomView.style.background = "linear-gradient(to bottom, #ffedd5, #f97316)";
                 document.getElementById("wardrobeSkin").style.display = "none";
             } else if(roomName === 'bathroom') {
                 tabs[2].classList.add("active");
                 document.getElementById("panel-bathroom").classList.add("active");
-                roomView.style.background = "linear-gradient(to bottom, #e0f2fe, #0284c7)"; // Xanh biển nhà tắm
+                roomView.style.background = "linear-gradient(to bottom, #e0f2fe, #0284c7)";
                 document.getElementById("wardrobeSkin").style.display = "none";
             } else if(roomName === 'bedroom') {
                 tabs[3].classList.add("active");
                 document.getElementById("panel-bedroom").classList.add("active");
-                roomView.style.background = isSleepingMode ? "linear-gradient(to bottom, #020617, #1e1b4b)" : "linear-gradient(to bottom, #ddd6fe, #6d28d9)"; // Tím phòng ngủ
+                roomView.style.background = isSleepingMode ? "linear-gradient(to bottom, #020617, #1e1b4b)" : "linear-gradient(to bottom, #ddd6fe, #6d28d9)";
                 document.getElementById("wardrobeSkin").style.display = "none";
             }
             saveGame();
         }
 
-        // TƯƠNG TÁC CHẠM VÀO NGƯỜI
         function clickPetDirectly() {
             if (isSleepingMode) return;
             data.happy = Math.min(100, data.happy + 5);
@@ -332,18 +277,16 @@
             saveGame();
         }
 
-        // PHÒNG KHÁCH: ĐỔI MÀU DA (SKIN)
         function changeSkin(filterStyle, event) {
-            event.stopPropagation(); // Không kích hoạt chạm vào người
+            event.stopPropagation();
             data.skinFilter = filterStyle;
             avatar.style.filter = filterStyle;
             showMessage("Oa! Diện mạo mới cá tính chưa này! ✨");
             saveGame();
         }
 
-        // PHÒNG KHÁCH: THAY ĐỔI NỘI THẤT NỀN
         function buyDecor(bgCss, price) {
-            if(data.coins < price) { addMessage("Cậu không đủ Tiền Vàng rồi! 🪙"); return; }
+            if(data.coins < price) { showMessage("Cậu không đủ Tiền Vàng rồi! 🪙"); return; }
             data.coins -= price;
             data.bgStyle = bgCss;
             roomView.style.background = bgCss;
@@ -353,7 +296,6 @@
             saveGame();
         }
 
-        // PHÒNG BẾP: CHO ĂN NHANH VÀ MUA ĐỒ ĂN
         function feedQuick(name, val) {
             if(data.hunger >= 100) { showMessage("No lắm rồi cậu ơi! 🥞"); return; }
             data.hunger = Math.min(100, data.hunger + val);
@@ -375,7 +317,6 @@
             saveGame();
         }
 
-        // PHÒNG TẮM: TẮM VÀ ĐÁNH RĂNG
         function actionBathroom(type) {
             if(type === 'shower') {
                 data.clean = 100;
@@ -383,4 +324,124 @@
                 showMessage("Kỳ cọ bong bóng mát mẻ quá xá! 🧼");
                 setTimeout(() => overlay.style.background = "none", 1500);
             } else if(type === 'brush') {
-                da
+                data.clean = Math.min(100, data.clean + 30);
+                data.happy = Math.min(100, data.happy + 10);
+                showMessage("Răng trắng sáng thơm tho tự tin! 🪥");
+                triggerAnimate("translateX(-10px) translateX(10px)");
+            }
+            updateHUD();
+            saveGame();
+        }
+
+        function toggleLight() {
+            const btn = document.getElementById("btn-light");
+            if(!isSleepingMode) {
+                isSleepingMode = true;
+                roomView.style.background = "linear-gradient(to bottom, #020617, #1e1b4b)";
+                overlay.style.background = "rgba(0,0,0,0.85)";
+                avatar.style.transform = "scale(0.85) translateY(20px)";
+                btn.innerText = "☀️ THỨC DẬY";
+                showMessage("Khò khò... Chúc cậu ngủ ngon nhé! 🌙");
+            } else {
+                isSleepingMode = false;
+                roomView.style.background = "linear-gradient(to bottom, #ddd6fe, #6d28d9)";
+                overlay.style.background = "none";
+                avatar.style.transform = "none";
+                btn.innerText = "💡 TẮT ĐÈN NGỦ";
+                showMessage("Chào buổi sáng! Ngày mới tràn năng lượng ☀️");
+            }
+        }
+
+        function openPopup(id) {
+            document.getElementById(`popup-${id}`).style.display = "flex";
+            if(id === 'minigame') startMiniGameEngine();
+        }
+        
+        function closePopup(id) {
+            document.getElementById(`popup-${id}`).style.display = "none";
+        }
+
+        function gainXPValue(amt) {
+            data.xp += amt;
+            if(data.xp >= 100) {
+                data.xp = 0; data.level++;
+                showMessage(`🎉 CHÚC MỪNG LÊN CẤP LEVEL ${data.level} RỒI!`);
+            }
+        }
+
+        function decayStatsRealTime() {
+            if (isSleepingMode) {
+                data.energy = Math.min(100, data.energy + 15);
+                data.hunger = Math.max(0, data.hunger - 2);
+            } else {
+                data.hunger = Math.max(0, data.hunger - 4);
+                data.happy = Math.max(0, data.happy - 4);
+                data.energy = Math.max(0, data.energy - 3);
+                data.clean = Math.max(0, data.clean - 2);
+            }
+            updateHUD();
+            saveGame();
+        }
+
+        function triggerAnimate(transformStyle) {
+            avatar.classList.remove("float-anim");
+            avatar.style.transform = transformStyle;
+            setTimeout(() => { avatar.style.transform = "none"; avatar.classList.add("float-anim"); }, 400);
+        }
+
+        function setupButtonCtrl(id, callback) {
+            const btn = document.getElementById(id);
+            btn.addEventListener("touchstart", (e) => { e.preventDefault(); callback(true); });
+            btn.addEventListener("touchend", (e) => { e.preventDefault(); callback(false); });
+            btn.addEventListener("mousedown", () => callback(true));
+            btn.addEventListener("mouseup", () => callback(false));
+        }
+
+        function startMiniGameEngine() {
+            isPlaying = true; score = 0; items = [];
+            canvas.width = canvas.parentElement.clientWidth - 40;
+            canvas.height = 240;
+            basketX = canvas.width / 2 - 25;
+            gameLoopInterval = setInterval(runGameLogic, 1000 / 30);
+        }
+
+        function runGameLogic() {
+            if(pressLeft) basketX = Math.max(0, basketX - 8);
+            if(pressRight) basketX = Math.min(canvas.width - 50, basketX + 8);
+            if(Math.random() < 0.06) {
+                items.push({ x: Math.random() * (canvas.width - 20), y: 0, speed: 4 + Math.random() * 4 });
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(basketX, canvas.height - 20, 50, 12);
+
+            for(let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += item.speed;
+                ctx.font = "18px Arial";
+                ctx.fillText("🍎", item.x, item.y);
+
+                if(item.y >= canvas.height - 30 && item.x >= basketX - 10 && item.x <= basketX + 50) {
+                    score++; items.splice(i, 1); continue;
+                }
+                if(item.y > canvas.height) items.splice(i, 1);
+            }
+            ctx.fillStyle = "#fff"; ctx.font = "bold 13px Arial";
+            ctx.fillText(`Điểm hứng quả: ${score}`, 15, 25);
+        }
+
+        function closeMiniGame() {
+            clearInterval(gameLoopInterval);
+            isPlaying = false;
+            let goldEarned = score * 4;
+            data.coins += goldEarned;
+            data.happy = Math.min(100, data.happy + 25);
+            gainXPValue(Math.floor(score * 4));
+            closePopup('minigame');
+            showMessage(`Trận đấu kết thúc! Kiếm được 💰 ${goldEarned} Tiền Vàng!`);
+            updateHUD();
+            saveGame();
+        }
+    </script>
+</body>
+</html>
